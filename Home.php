@@ -497,6 +497,24 @@ h1 {
                             </li>
                             <li>
                                 <div class="li_wrap">
+                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
+                                    <div class="text">Universite de Balballa</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="li_wrap">
+                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
+                                    <div class="text">Institut Francais</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="li_wrap">
+                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
+                                    <div class="text">American Corn</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="li_wrap">
                                     <div class="icon"><i class="fa-solid fa-list" aria-hidden="true"></i></div>
                                     <div class="text">Category</div>
                                 </div>
