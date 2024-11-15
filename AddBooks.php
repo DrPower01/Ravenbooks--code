@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
         $pageCount = $_POST['pageCount'];
         $categories = $_POST['categories'];
         $language = $_POST['language'];
-        $coverUrl = $_POST['coverUrl'];
+        $coverUrl = $_POST['cover_url'];
 
         // Convert the published date to year only
         if ($publishedDate) {
@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
         }
 
         // SQL query to insert the data into the database
-        $sql = "INSERT INTO Books (title, authors, publisher, publishedDate, description, pageCount, categories, language, isbn, coverUrl)
+        $sql = "INSERT INTO Books (title, authors, publisher, publishedDate, description, pageCount, categories, language, isbn, cover_url)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $conn->prepare($sql);
@@ -234,7 +234,7 @@ if (isset($_GET['isbn'])) {
                 <input type='hidden' name='categories' value='$categories'>
                 <input type='hidden' name='language' value='$language'>
                 <input type='hidden' name='isbn' value='$isbn'>
-                <input type='hidden' name='coverUrl' value='$coverUrl'>
+                <input type='hidden' name='coverUrl' value='$cover_url'>
                 <button type='submit' name='submit' class='submit-button'>Add to Database</button>
               </form>";
         echo "</div>";
