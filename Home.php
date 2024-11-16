@@ -479,8 +479,12 @@ h1 {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 14px;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease-in-out; /* Smooth transition for showing */
 }
-
+.book-cover-container:hover .tag {
+    opacity: 1; /* Show the tag when the book cover is hovered */
+}
 
 @media (max-width: 480px) {
     .book_grid {
@@ -520,7 +524,7 @@ h1 {
                             <li>
                                 <div class="li_wrap">
                                     <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
-                                    <div class="text">Universite de Balballa</div>
+                                    <a href="UnivB.php"><div class="text">Universite de Balballa</div></a>
                                 </div>
                             </li>
                             <li>
