@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 }
 
 // Query to get books
-$sql = "SELECT id, title, authors, cover_url FROM Books"; // Adjust field names as per your database structure
+$sql = "SELECT id, title, authors, cover_url,Faculte FROM Books ORDER BY id DESC"; // Adjust field names as per your database structure
 $result = $conn->query($sql);
 ?>
 
@@ -459,6 +459,28 @@ h1 {
         grid-template-columns: repeat(2, 1fr); /* Adjust grid for smaller screens */
     }
 }
+.book-cover-container {
+    position: relative;
+    display: inline-block;
+}
+
+.book-cover-container img {
+    display: block;
+    width: 100%; /* Adjust as needed */
+    height: auto;
+}
+
+.tag {
+    position: absolute;
+    top: 10px; /* Adjust the position as needed */
+    left: 10px; /* Adjust the position as needed */
+    background-color: rgba(0, 102, 204, 0.8); /* Semi-transparent background */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
 
 @media (max-width: 480px) {
     .book_grid {
@@ -580,16 +602,33 @@ h1 {
                     </div>
                 </div>
                 <div class="search-container">
-                    <p>Navigation:</p>
+                    <p>Newest Release:</p>
+
+
                     <div class="book_grid">
-                    <?php
+                        <?php
                         if ($result->num_rows > 0) {
                             // Output data of each book
                             while ($row = $result->fetch_assoc()) {
                                 echo '<div class="book">';
-                                // Create a link wrapping the book
                                 echo '<a href="book_details.php?id=' . htmlspecialchars($row["id"]) . '" class="book-link">';
-                                echo '<img src="' . htmlspecialchars($row["cover_url"]) . '" alt="Book cover">';
+                                
+                                // Wrapper for the image and tag
+                                echo '<div class="book-cover-container">';
+                                
+                                // Check if cover URL is empty or null
+                                if (!empty($row["cover_url"])) {
+                                    echo '<img src="' . htmlspecialchars($row["cover_url"]) . '" alt="Book cover" onerror="this.onerror=null; this.src=\'placeholder_icon.png\';">';
+                                } else {
+                                    // Display a placeholder icon if no cover URL is provided
+                                    echo '<img src="placeholder_icon.png" alt="No cover available">';
+                                }
+                                
+                                // Add the tag element with the 'Faculte' field
+                                echo '<div class="tag">' . htmlspecialchars($row["Faculte"]) . '</div>';
+                                
+                                echo '</div>'; // Close the wrapper div
+                                
                                 echo '<div class="book-title">' . htmlspecialchars($row["title"]) . '</div>';
                                 echo '<div class="book-author">by ' . htmlspecialchars($row["authors"]) . '</div>';
                                 echo '</a>';
@@ -600,6 +639,11 @@ h1 {
                         }
                         $conn->close();
                         ?>
+                    </div>
+
+
+
+
                     </div>
                     <!-- Pagination -->
                     <div class="pagination">
