@@ -16,6 +16,22 @@ if ($conn->connect_error) {
 $sql = "SELECT id, title, authors, cover_url,Faculte FROM Books ORDER BY id DESC"; // Adjust field names as per your database structure
 $result = $conn->query($sql);
 ?>
+<?php
+session_start(); // Start the session
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    // User is not logged in
+    $loginMessage = "You are not logged in. Please <a href='login.php'>log in</a>.";
+} else {
+    // User is logged in
+    $user_name = $_SESSION['user_name']; // Retrieve user's name from session
+    $firstLetter = strtoupper($user_name[0]); // Extract and capitalize the first letter
+    
+    
+}
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,6 +48,9 @@ $result = $conn->query($sql);
     box-sizing: border-box;
     list-style: none;
     font-family: "Times New Roman", sans-serif;
+}
+.nav a, .menu a {
+    text-decoration: none;
 }
 
 .nav {
@@ -499,15 +518,153 @@ h1 {
         font-size: 20px;
     }
 }
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Times New Roman", sans-serif;
+        }
+        .nav {
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .nav .left {
+            display: flex;
+            align-items: center;
+        }
+        .nav .left h1 {
+            font-size: 24px;
+            color: #333;
+            margin-left: 10px;
+        }
+        .nav .menu {
+            display: flex;
+            align-items: center;
+        }
+        .nav .menu a {
+            text-decoration: none;
+            color: #333;
+            margin: 0 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .nav .menu a:hover {
+            color: #007BFF;
+        }
+        .user-info-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .user-info {
+            width: 40px;
+            height: 40px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+        .user-info:hover {
+            transform: scale(1.1);
+        }
+        .logout {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: #FF4136;
+            color: white;
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .user-info-container:hover .logout {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav .menu {
+                margin-top: 10px;
+                flex-wrap: wrap;
+            }
+            .nav .menu a {
+                margin: 5px 0;
+            }
+        }
+        .user-info .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 1000;
+}
 
+.user-info:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.dropdown-menu a i {
+    margin-right: 8px;
+}
+
+.dropdown-menu a:hover {
+    background: #f4f4f4;
+    color: #007bff;
+}
     </style>
 </head>
 <body>
+    <!-- Navigation bar -->
+    <div class="nav">
+        <h1>Raven Books</h1>
+        <div class="user-info-container">
+            <div class="user-info">
+                <?php echo $firstLetter; ?>
+                <div class="dropdown-menu">
+                        <a href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#"><i class="fas fa-heart"></i> Wishlist</a>
+                        <a href="#"><i class="fas fa-user-friends"></i> Following</a>
+                        <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+            </div>
+            <?php if(isset($loginMessage)) { echo $loginMessage; } ?>
+        </div>
+    </div>
+
     <div class="wrapper">
         <div class="nav">
             <div class="left">
                 <div class="header">
-                    <h1>Raven Books</h1>
+                    
                 </div>
                 <div class="menu_wrap pb">
                     <div class="title">
@@ -517,26 +674,26 @@ h1 {
                         <ul>
                             <li>
                                 <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
+                                    <div class="icon"><i class="fa-solid fa-book-atlas"></i></div>
                                     <div class="text">Discover</div>
                                 </div>
                             </li>
                             <li>
                                 <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
+                                    <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
                                     <a href="UnivB.php"><div class="text">Universite de Balballa</div></a>
                                 </div>
                             </li>
                             <li>
                                 <div class="li_wrap">
                                     <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
-                                    <div class="text">Institut Francais</div>
+                                    <a href="IF.php"><div class="text">Institut Francais</div></a>
                                 </div>
                             </li>
                             <li>
                                 <div class="li_wrap">
                                     <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
-                                    <div class="text">American Corn</div>
+                                    <a href="AC.php"><div class="text">American Corn</div></a>
                                 </div>
                             </li>
                             <li>
@@ -607,7 +764,12 @@ h1 {
                 </div>
                 <div class="search-container">
                     <p>Newest Release:</p>
-
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <button class="prev">Previous</button>
+                        <span class="page-number">1</span>
+                        <button class="next">Next</button>
+                    </div>
 
                     <div class="book_grid">
                         <?php
@@ -649,12 +811,7 @@ h1 {
 
 
                     </div>
-                    <!-- Pagination -->
-                    <div class="pagination">
-                        <button class="prev">Previous</button>
-                        <span class="page-number">1</span>
-                        <button class="next">Next</button>
-                    </div>
+
                 </div>
             </div>
         </div>
