@@ -12,9 +12,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Query to get books
-$sql = "SELECT id, title, authors, cover_url,Faculte FROM Books ORDER BY id DESC"; // Adjust field names as per your database structure
-$result = $conn->query($sql);
 ?>
 <?php
 session_start(); // Start the session
@@ -232,8 +229,8 @@ p {
 
 .book_grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr); /* 6 books horizontally */
-    grid-template-rows: repeat(2, 1fr); /* 2 rows vertically */
+    grid-template-columns: repeat(20, 1fr); /* 6 books horizontally */
+    grid-template-rows: repeat(1, 1fr); /* 2 rows vertically */
     gap: 20px; /* Space between books */
     padding: 20px;
 }
@@ -640,6 +637,72 @@ h1 {
     background: #f4f4f4;
     color: #007bff;
 }
+.book_scroll_container {
+        display: flex; /* Arrange the books in a horizontal row */
+        overflow-x: scroll; /* Enable horizontal scrolling */
+        padding: 10px;
+        gap: 15px; /* Add some space between the books */
+    }
+
+    .book_scroll_container::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .book_scroll_container::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 4px;
+    }
+
+    .book_scroll_container::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+
+    /* Individual Book Item */
+    .book {
+        width: 180px; /* Set a fixed width for each book */
+        flex-shrink: 0; /* Prevent the books from shrinking */
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        padding: 10px;
+        overflow: hidden;
+    }
+
+    .book-cover-container {
+        position: relative;
+        width: 100%;
+        height: 250px; /* Set a height for the book cover */
+        overflow: hidden;
+    }
+
+    .book-cover-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures the image covers the area */
+    }
+
+    .book-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .book-author {
+        font-size: 14px;
+        color: #777;
+    }
+
+    .tag {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
     </style>
 </head>
 <body>
@@ -720,7 +783,7 @@ h1 {
                                     <div class="text">About us</div>
                                 </div>
                             </li><br>
-                            <hr>
+                            
                             <br><br>
                             <li>
                                 <div class="li_wrap">
@@ -741,7 +804,7 @@ h1 {
                                 </div>
                             </li>
                         </ul><br>
-                        <hr>
+                       
                     </div>
                     <div class="img_holder">
                         <img src="ab5.webp" alt="picture">
@@ -755,112 +818,80 @@ h1 {
                         <div class="search-bar">
                             <select class="category-select">
                                 <option value="all-categories">All Categories</option>
-                                <!-- More categories can be added -->
                             </select>
                             <input type="text" class="search-input" placeholder="Find the book you love...">
                             <button class="search-button">Search</button>
                         </div>
                     </div>
                 </div>
-                <div class="search-container">
-                    <p>Newest Release:</p>
-                    <!-- Pagination -->
-                    <div class="pagination">
-                        <button class="prev">Previous</button>
-                        <span class="page-number">1</span>
-                        <button class="next">Next</button>
-                    </div>
+                <p>Recomended:</p>
+                <div class="book_scroll_container">
+                            <?php
+                            // Recommended books query
+                            $sql1 = "SELECT Books.id, Books.title, Books.authors, Books.publisher, Books.cover_url, Books.description, Books.Faculte, COUNT(views.id) AS view_count
+                                        FROM Books
+                                        LEFT JOIN views ON Books.id = views.book_id
+                                        GROUP BY Books.id
+                                        ORDER BY view_count DESC
+                                        LIMIT 10";
+                            $result1 = $conn->query($sql1);
 
-                    <div class="book_grid">
-                        <?php
-                        if ($result->num_rows > 0) {
-                            // Output data of each book
-                            while ($row = $result->fetch_assoc()) {
-                                echo '<div class="book">';
-                                echo '<a href="book_details.php?id=' . htmlspecialchars($row["id"]) . '" class="book-link">';
-                                
-                                // Wrapper for the image and tag
-                                echo '<div class="book-cover-container">';
-                                
-                                // Check if cover URL is empty or null
-                                if (!empty($row["cover_url"])) {
-                                    echo '<img src="' . htmlspecialchars($row["cover_url"]) . '" alt="Book cover" onerror="this.onerror=null; this.src=\'placeholder_icon.png\';">';
-                                } else {
-                                    // Display a placeholder icon if no cover URL is provided
-                                    echo '<img src="placeholder_icon.png" alt="No cover available">';
+                            if ($result1->num_rows > 0) {
+                                while ($row = $result1->fetch_assoc()) {
+                                    echo '<div class="book">';
+                                    echo '<a href="book_details.php?id=' . htmlspecialchars($row["id"]) . '" class="book-link">';
+                                    echo '<div class="book-cover-container">';
+                                    if (!empty($row["cover_url"])) {
+                                        echo '<img src="' . htmlspecialchars($row["cover_url"]) . '" alt="Book cover" onerror="this.onerror=null; this.src=\'placeholder_icon.png\';">';
+                                    } else {
+                                        echo '<img src="placeholder_icon.png" alt="No cover available">';
+                                    }
+                                    echo '<div class="tag">' . htmlspecialchars($row["Faculte"]) . '</div>';
+                                    echo '</div>';
+                                    echo '<div class="book-title">' . htmlspecialchars($row["title"]) . '</div>';
+                                    echo '<div class="book-author">by ' . htmlspecialchars($row["authors"]) . '</div>';
+                                    echo '</a>';
+                                    echo '</div>';
                                 }
-                                
-                                // Add the tag element with the 'Faculte' field
-                                echo '<div class="tag">' . htmlspecialchars($row["Faculte"]) . '</div>';
-                                
-                                echo '</div>'; // Close the wrapper div
-                                
-                                echo '<div class="book-title">' . htmlspecialchars($row["title"]) . '</div>';
-                                echo '<div class="book-author">by ' . htmlspecialchars($row["authors"]) . '</div>';
-                                echo '</a>';
-                                echo '</div>';
+                            } else {
+                                echo '<p>No recommended books found.</p>';
                             }
-                        } else {
-                            echo '<p>No books found.</p>';
-                        }
-                        $conn->close();
-                        ?>
+                            ?>
+                        </div><br><br>
+                            <p>Lastest:</p>
+                        <div class="book_scroll_container">
+                            <?php
+                            // Newest books query
+                            $sql2 = "SELECT * FROM Books ORDER BY id DESC LIMIT 10";
+                            $result2 = $conn->query($sql2);
+
+                            if ($result2->num_rows > 0) {
+                                while ($row = $result2->fetch_assoc()) {
+                                    echo '<div class="book">';
+                                    echo '<a href="book_details.php?id=' . htmlspecialchars($row["id"]) . '" class="book-link">';
+                                    echo '<div class="book-cover-container">';
+                                    if (!empty($row["cover_url"])) {
+                                        echo '<img src="' . htmlspecialchars($row["cover_url"]) . '" alt="Book cover" onerror="this.onerror=null; this.src=\'placeholder_icon.png\';">';
+                                    } else {
+                                        echo '<img src="placeholder_icon.png" alt="No cover available">';
+                                    }
+                                    echo '<div class="tag">' . htmlspecialchars($row["Faculte"]) . '</div>';
+                                    echo '</div>';
+                                    echo '<div class="book-title">' . htmlspecialchars($row["title"]) . '</div>';
+                                    echo '<div class="book-author">by ' . htmlspecialchars($row["authors"]) . '</div>';
+                                    echo '</a>';
+                                    echo '</div>';
+                                }
+                            } else {
+                                echo '<p>No newest books found.</p>';
+                            }
+                            ?>
+                        </div>
                     </div>
-
-
-
-
-                    </div>
-
                 </div>
             </div>
         </div>
     </div>
-    <script>
-            let currentPage = 1;
-        const booksPerPage = 12; // 6 books per row * 2 rows = 12 books per page
-
-        const books = document.querySelectorAll('.book');
-        const totalBooks = books.length; // Get the total number of books
-
-        // Calculate total pages dynamically
-        const totalPages = Math.ceil(totalBooks / booksPerPage);
-
-        // Function to show the books for the current page
-        function showPage(page) {
-            const startIndex = (page - 1) * booksPerPage;
-            const endIndex = startIndex + booksPerPage;
-            
-            books.forEach((book, index) => {
-                if (index >= startIndex && index < endIndex) {
-                    book.style.display = 'block';
-                } else {
-                    book.style.display = 'none';
-                }
-            });
-
-            // Update page number
-            document.querySelector('.page-number').textContent = page;
-        }
-
-        // Pagination event listeners
-        document.querySelector('.next').addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                showPage(currentPage);
-            }
-        });
-
-        document.querySelector('.prev').addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                showPage(currentPage);
-            }
-        });
-
-        // Initial load
-        showPage(currentPage);
-
-    </script>
+    
 </body>
 </html>
