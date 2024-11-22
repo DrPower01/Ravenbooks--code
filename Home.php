@@ -27,6 +27,20 @@ if (!isset($_SESSION['user_id'])) {
     
     
 }
+$stmt = $conn->prepare("SELECT id, email, password, name, role FROM users WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($id, $db_email, $db_password, $db_name, $db_role);
+$stmt->fetch();
+
+if (password_verify($password, $db_password)) {
+    $_SESSION['user_id'] = $id;
+    $_SESSION['user_name'] = $db_name;
+    $_SESSION['user_email'] = $db_email;
+    $_SESSION['user_role'] = $db_role;
+}
+
 ?>
 
 
@@ -815,6 +829,7 @@ h1 {
                 <div class="background">
                     <div class="search-container">
                         <h2>Discover</h2>
+                        <a href="AdvanceBooksADD.php">add</a>
                         <div class="search-bar">
                             <select class="category-select">
                                 <option value="all-categories">All Categories</option>
@@ -824,7 +839,7 @@ h1 {
                         </div>
                     </div>
                 </div>
-                <p>Recomended:</p>
+                <p>Most viewed:</p>
                 <div class="book_scroll_container">
                             <?php
                             // Recommended books query
