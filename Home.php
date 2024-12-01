@@ -2,7 +2,7 @@
 // Database connection (ensure this matches your database setup)
 $servername = "localhost";
 $username = "root";
-$password = "";
+$password = "nigga";
 $dbname = "library";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -11,651 +11,497 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
-// Query to get books
-$sql = "SELECT id, title, authors, cover_url FROM Books"; // Adjust field names as per your database structure
-$result = $conn->query($sql);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/02a370eee2.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="test1.css">
-    <title>Raven Books</title>
+    <title>Welcome to Ravenbooks</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    list-style: none;
-    font-family: "Times New Roman", sans-serif;
-}
+        /* Custom Styles */
+        .header {
+            background-color: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+        }
+
+        .nav-container {
+            height: 100vh;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .books-container {
+            height: 100vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .book_scroll_container {
+            display: flex;
+            overflow-x: scroll;
+            padding: 10px;
+            gap: 15px;
+        }
+
+        /* Scrollbar Styles */
+        .book_scroll_container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .book_scroll_container::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 4px;
+        }
+
+        .book_scroll_container::-webkit-scrollbar-thumb:hover {
+            background-color: #555;
+        }
+
+        .book {
+            width: 180px;
+            flex-shrink: 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .book-cover-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .book-cover-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .book-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .book-author {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #343a40;
+            color: #fff;
+            padding: 10px 20px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .dropdown-toggle::after {
+            margin-left: 8px;
+        }
+        .dropdown-menu {
+            z-index: 1050; /* Ensures dropdown appears on top of other elements */
+        }
+        .container.mt-5 {
+            margin: 0 !important;
+        }
 
-.nav {
-    width: 800px;
-    background: white;
-    display: flex;
-}
-
-.left {
-    width: 250px;
-    padding: 0 20px;
-}
-
-.left .img_holder {
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 20px;
-    border: 2px solid rgb(243, 243, 243);
-    border-radius: 15px;
-    background-color: #f9f9f9;
-    padding: 10px;
-}
-
-.left .img_holder img {
-    width: 130px;
-    border-radius: 30px;
-}
-
-.pb {
-    padding-bottom: 20px;
-}
-
-h1 {
-    text-transform: uppercase;
-    font-size: 22px;
-    margin-top: 18px;
-}
-
-.title {
-    font-size: 15px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    padding-bottom: 10px;
-    color: rgb(155, 145, 154);
-    position: relative;
-    margin-top: 35px;
-    margin-left: 16px;
-    margin-bottom: 13px;
-}
-
-.left .icon {
-    font-size: 13px;
-    color: rgb(155, 145, 154);
-    margin-left: 16px;
-}
-
-.left .text {
-    color: rgb(32, 31, 31);
-    font-size: 13px;
-}
-
-.menu .li_wrap {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 15px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.menu .li_wrap:hover .icon {
-    background-color: rgb(255, 88, 46);
-    color: white;
-}
-
-.menu .li_wrap:hover .text {
-    font-weight: bold;
-    color: rgb(27, 25, 25);
-}
-
-.menu .li_wrap .icon {
-    width: 30px;
-    height: 30px;
-    background: rgb(243, 243, 243);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-}
-
-.menu .li_wrap .text {
-    width: calc(100% - 50px);
-    word-break: break-word;
-}
-
-hr {
-    width: 120px;
-    margin-left: 16px;
-}
-
-.right {
-    width: calc(100% - 250px);
-}
-
-.search-container {
-    width: 100%;    
-    max-width: 800px;
-    margin-left: 40px;
-    padding: 20px;
-}
-
-h2 {
-    font-size: 28px;
-    color: #333;
-    margin-bottom: 33px;
-    font-weight: normal;
-}
-
-.search-bar {
-    display: flex;
-    align-items: center;
-    background-color: #fff;
-    padding: 7px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 0 auto;
-    margin-bottom: 20px;
-}
-
-.category-select {
-    width: 150px;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    margin-right: 10px;
-    font-size: 14px;
-    background-color: #ffffff;
-    color: #555;
-}
-
-.search-input {
-    flex-grow: 2;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.search-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #333;
-    color: white;
-    font-size: 14px;
-    border-radius: 4px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.search-button:active {
-    background-color: rgb(236, 236, 236);
-    color: black;
-}
-
-.right_inner {
-    margin-left: 60px;
-    padding: 20px;
-}
-
-p {
-    margin-bottom: 2%;
-    color: #525151;
-    font-size: 24px;
-    margin-left: 0%;
-}
-
-.book_grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr); /* 6 books horizontally */
-    grid-template-rows: repeat(2, 1fr); /* 2 rows vertically */
-    gap: 20px; /* Space between books */
-    padding: 20px;
-}
-
-.book {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.book img {
-    width: 100%;
-    height: auto;
-    max-width: 180px; /* Adjust to fit 6 books in a row */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
-    transition: box-shadow 0.3s ease; /* Smooth transition for hover effect */
-}
-.book:hover img {
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-
-.book-title {
-    font-size: 18px; /* Larger title font */
-    font-weight: bold;
-    color: #333;
-    margin-top: 15px;
-}
-
-.book-author {
-    font-size: 16px; /* Larger author font */
-    color: #666;
-    margin-top: 5px;
-}
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.pagination button {
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    margin: 0 10px;
-    cursor: pointer;
-}
-
-.pagination button:hover {
-    background-color: #555;
-}
-
-.pagination .page-number {
-    font-size: 18px;
-    margin: 0 10px;
-}
-.cat {
-    margin-left: 40px;
-    padding: 20px;
-}
-
-.cat .nm {
-    color: #525151;
-    font-size: 24px;
-}
-/* Media Query for Mobile Screens */
-@media (max-width: 768px) {
-    .book_grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 books per row */
-        grid-template-rows: repeat(4, 1fr); /* 4 rows */
-    }
-
-    .book img {
-        max-width: 150px; /* Adjust image size */
-    }
-
-    .right {
-        width: 100%;
-        margin-left: 0;
-    }
-
-    .nav {
-        flex-direction: column; /* Stack the left and right sections */
-    }
-
-    .left {
-        width: 100%; /* Take full width on mobile */
-    }
-
-    .search-container {
-        max-width: 100%; /* Full width search container */
-        margin-left: 0;
-    }
-
-    h2 {
-        font-size: 24px;
-    }
-    .nav {
-    width: 100%;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-}
-
-.left {
-    width: 100%;
-    padding: 0 20px;
-}
-
-.left .img_holder {
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 20px;
-    border: 2px solid rgb(243, 243, 243);
-    border-radius: 15px;
-    background-color: #f9f9f9;
-    padding: 10px;
-}
-
-.left .img_holder img {
-    width: 130px;
-    border-radius: 30px;
-}
-
-h1 {
-    text-transform: uppercase;
-    font-size: 22px;
-    margin-top: 18px;
-}
-
-/* Menu styles */
-.menu {
-    display: flex;
-    flex-direction: column;
-}
-
-.menu .li_wrap {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 15px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.menu .li_wrap .icon {
-    width: 30px;
-    height: 30px;
-    background: rgb(243, 243, 243);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-}
-
-.menu .li_wrap .text {
-    width: calc(100% - 50px);
-    word-break: break-word;
-}
-
-    .nav {
-        flex-direction: column;
-        padding: 0;
-    }
-
-    .left {
-        width: 100%;
-        padding: 10px;
-    }
-
-    .left .img_holder {
-        text-align: center;
-        padding: 10px;
-    }
-
-    h1 {
-        font-size: 18px;
-    }
-
-    /* Adjust menu items to stack */
-    .menu .li_wrap {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    /* Adjust the icon and text alignment */
-    .menu .li_wrap .icon {
-        margin-bottom: 8px;
-        margin-right: 0;
-    }
-
-    /* Adjust text size for mobile */
-    .menu .li_wrap .text {
-        font-size: 14px;
-    }
-
-    .menu .li_wrap:hover .icon {
-        background-color: rgb(255, 88, 46);
-        color: white;
-    }
-
-    .menu .li_wrap:hover .text {
-        font-weight: bold;
-        color: rgb(27, 25, 25);
-    }
-    
-    .search-container {
-        margin-left: 0;
-        padding: 10px;
-    }
-
-    .search-bar {
-        flex-direction: column;
-    }
-
-    .category-select,
-    .search-input {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .search-button {
-        width: 100%;
-        margin-top: 10px;
-    }
-    
-    .right {
-        width: 100%;
-        padding: 10px;
-    }
-    
-    .book_grid {
-        grid-template-columns: repeat(2, 1fr); /* Adjust grid for smaller screens */
-    }
-}
-
-@media (max-width: 480px) {
-    .book_grid {
-        grid-template-columns: 1fr; /* 1 book per row */
-    }
-
-    .book img {
-        max-width: 120px; /* Smaller image size for mobile */
-    }
-
-    h2 {
-        font-size: 20px;
-    }
-}
 
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <div class="nav">
-            <div class="left">
-                <div class="header">
-                    <h1>Raven Books</h1>
+
+    <!-- Header -->
+    
+    <header class="header">
+        <div class="header-title">Ravenbooks</div>
+        <div>
+            <?php if (!isset($_SESSION['user_name'])): ?>
+                <!-- Login Button if no session -->
+                <a href="login.php" class="btn btn-primary">Login</a>
+            <?php else: ?>
+                <!-- Dropdown Menu if session exists -->
+                <div class="dropdown">
+                    <button
+                        class="btn btn-primary dropdown-toggle"
+                        type="button"
+                        id="userMenu"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <?= htmlspecialchars($_SESSION['user_name']) ?>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-thumbs-up like-icon"></i> Liked Books</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-heart"></i> Wishlist</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
                 </div>
-                <div class="menu_wrap pb">
-                    <div class="title">
-                        <p>MENU</p>
-                    </div>
-                    <div class="menu">
-                        <ul>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
-                                    <div class="text">Discover</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
-                                    <div class="text">Universite de Balballa</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
-                                    <div class="text">Institut Francais</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
-                                    <div class="text">American Corn</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-list" aria-hidden="true"></i></div>
-                                    <div class="text">Category</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-bookmark" aria-hidden="true"></i></div>
-                                    <div class="text">My Library</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i></div>
-                                    <div class="text">Download</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-file-lines"></i></i></div>
-                                    <div class="text">About us</div>
-                                </div>
-                            </li><br>
-                            <hr>
-                            <br><br>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
-                                    <div class="text">Log in</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i></div>
-                                    <div class="text">Log out</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="li_wrap">
-                                    <div class="icon"><i class="fa-solid fa-user-tie"></i></div>
-                                    <div class="text">Admin</div>
-                                </div>
-                            </li>
-                        </ul><br>
-                        <hr>
-                    </div>
-                    <div class="img_holder">
-                        <img src="ab5.webp" alt="picture">
-                    </div>
-                </div>
+
+            <?php endif; ?>
+    </header>
+    
+    </header>
+
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Left Navigation -->
+            <div class="col-md-3 col-lg-2 nav-container">
+                <h4>Navigation</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link"><i class="fa-solid fa-book-atlas"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="search.html" class="nav-link"><i class="fa-solid fa-house"></i> Browse</a>
+                    </li>
+                    <!-- Dropdown for Université de Balballa -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="balballaDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-graduation-cap"></i> Université de Balballa
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="balballaDropdown">
+                            <li><a class="dropdown-item" href="#">Balballa Library 1</a></li>
+                            <li><a class="dropdown-item" href="#">Balballa Library 2</a></li>
+                        </ul>
+                    </li>
+                    <!-- Dropdown for Libraries -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="librariesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-landmark"></i> Libraries
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="librariesDropdown">
+                            <li><a class="dropdown-item" href="#">Institut Français</a></li>
+                            <li><a class="dropdown-item" href="#">American Corn</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
-            <div class="right">
-                <div class="background">
-                    <div class="search-container">
-                        <h2>Discover</h2>
-                        <div class="search-bar">
-                            <select class="category-select">
-                                <option value="all-categories">All Categories</option>
-                                <!-- More categories can be added -->
-                            </select>
-                            <input type="text" class="search-input" placeholder="Find the book you love...">
-                            <button class="search-button">Search</button>
+
+            <!-- Tab Content -->
+            <div class="col-md-9 col-lg-10">
+                <!-- Tab Navigation -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="search-tab" data-bs-toggle="tab" data-bs-target="#search" type="button" role="tab" aria-controls="search" aria-selected="true">
+                            Search
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="discover-tab" data-bs-toggle="tab" data-bs-target="#discover" type="button" role="tab" aria-controls="discover" aria-selected="false">
+                            Discover
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="filter-tab" data-bs-toggle="tab" data-bs-target="#filter" type="button" role="tab" aria-controls="filter" aria-selected="false">
+                            Filter
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content mt-3" id="myTabContent">
+                    <!-- Search Tab -->
+                    <div class="tab-pane fade show active" id="search" role="tabpanel" aria-labelledby="search-tab">
+                    <style>
+                        .search-container {
+                            max-width: 600px;
+                            margin: 50px auto;
+                            position: relative;
+                        }
+
+                        .search-results {
+                            position: absolute;
+                            top: 100%;
+                            left: 0;
+                            width: 100%;
+                            background-color: #fff;
+                            border: 1px solid #ddd;
+                            border-radius: 0.375rem;
+                            max-height: 300px;
+                            overflow-y: auto;
+                            z-index: 1000;
+                        }
+
+                        .search-results li {
+                            display: flex;
+                            align-items: center;
+                            padding: 10px;
+                            border-bottom: 1px solid #f0f0f0;
+                            cursor: pointer;
+                        }
+
+                        .search-results li img {
+                            width: 50px;
+                            height: 50px;
+                            margin-right: 10px;
+                            border-radius: 0.375rem;
+                            object-fit: cover;
+                        }
+
+                        .search-results li:hover {
+                            background-color: #f8f9fa;
+                        }
+
+                        .search-results li:last-child {
+                            border-bottom: none;
+                        }
+
+                        .no-results {
+                            padding: 10px;
+                            color: #6c757d;
+                            text-align: center;
+                        }
+                    </style>
+                <body>
+                    <div class="container">
+                        <div class="search-container">
+                            <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Search books by title, author, or ISBN..."
+                                id="searchBox"
+                            />
+                            <ul class="list-group search-results" id="searchResults"></ul>
                         </div>
                     </div>
-                </div>
-                <div class="search-container">
-                    <p>Navigation:</p>
-                    <div class="book_grid">
-                    <?php
-                        if ($result->num_rows > 0) {
-                            // Output data of each book
-                            while ($row = $result->fetch_assoc()) {
-                                echo '<div class="book">';
-                                // Create a link wrapping the book
-                                echo '<a href="book_details.php?id=' . htmlspecialchars($row["id"]) . '" class="book-link">';
-                                echo '<img src="' . htmlspecialchars($row["cover_url"]) . '" alt="Book cover">';
-                                echo '<div class="book-title">' . htmlspecialchars($row["title"]) . '</div>';
-                                echo '<div class="book-author">by ' . htmlspecialchars($row["authors"]) . '</div>';
-                                echo '</a>';
-                                echo '</div>';
+
+                    <!-- Bootstrap JS and dependencies -->
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+                    <script>
+                        document.getElementById('searchBox').addEventListener('input', function () {
+                            const query = this.value.trim();
+                            const resultsContainer = document.getElementById('searchResults');
+
+                            // Clear previous results if query is empty
+                            if (query === '') {
+                                resultsContainer.innerHTML = '';
+                                return;
                             }
-                        } else {
-                            echo '<p>No books found.</p>';
-                        }
-                        $conn->close();
-                        ?>
+
+                            // Perform AJAX request
+                            fetch(`search.php?query=${encodeURIComponent(query)}`)
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    resultsContainer.innerHTML = '';
+
+                                    if (data.length === 0) {
+                                        resultsContainer.innerHTML =
+                                            '<li class="list-group-item no-results">No books found</li>';
+                                        return;
+                                    }
+
+                                    // Populate results
+                                    data.forEach((book) => {
+                                        const li = document.createElement('li');
+                                        li.className = 'list-group-item d-flex align-items-center';
+                                        li.innerHTML = `
+                                            <img src="${book.cover_url}" alt="${book.title}">
+                                            <div>
+                                                <strong>${book.title}</strong><br>
+                                                <span class="text-muted">${book.authors}</span>
+                                            </div>
+                                        `;
+                                        li.addEventListener('click', () => {
+                                            window.location.href = `book_details.php?id=${book.id}`;
+                                        });
+                                        resultsContainer.appendChild(li);
+                                    });
+                                })
+                                .catch((error) => {
+                                    console.error('Error fetching data:', error);
+                                });
+                        });
+                    </script>
                     </div>
-                    <!-- Pagination -->
-                    <div class="pagination">
-                        <button class="prev">Previous</button>
-                        <span class="page-number">1</span>
-                        <button class="next">Next</button>
+
+                    <!-- Discover Tab -->
+                    <div class="tab-pane fade" id="discover" role="tabpanel" aria-labelledby="discover-tab">
+                    <style>
+                        .book_scroll_container {
+                            display: flex;
+                            overflow-x: scroll;
+                            padding: 10px;
+                            gap: 15px;
+                        }
+
+                        .book_scroll_container::-webkit-scrollbar {
+                            height: 8px;
+                        }
+
+                        .book_scroll_container::-webkit-scrollbar-thumb {
+                            background-color: #888;
+                            border-radius: 4px;
+                        }
+
+                        .book_scroll_container::-webkit-scrollbar-thumb:hover {
+                            background-color: #555;
+                        }
+
+                        .book {
+                            width: 180px;
+                            flex-shrink: 0;
+                            background-color: #fff;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                            text-align: center;
+                            padding: 10px;
+                            overflow: hidden;
+                        }
+
+                        .book-cover-container {
+                            position: relative;
+                            width: 100%;
+                            height: 250px;
+                            overflow: hidden;
+                        }
+
+                        .book-cover-container img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+
+                        .book-title {
+                            font-size: 16px;
+                            font-weight: bold;
+                            margin-top: 10px;
+                        }
+
+                        .book-author {
+                            font-size: 14px;
+                            color: #777;
+                        }
+
+                        .tag {
+                            position: absolute;
+                            top: 10px;
+                            right: 10px;
+                            background-color: rgba(0, 0, 0, 0.6);
+                            color: #fff;
+                            padding: 5px;
+                            border-radius: 5px;
+                            font-size: 14px;
+                        }
+
+                        .nav-container {
+                            height: 100vh;
+                            background-color: #f8f9fa;
+                            padding: 20px;
+                        }
+
+                        .books-container {
+                            height: 100vh;
+                            overflow-y: auto;
+                            padding: 20px;
+                        }
+
+                    </style>
+                    <p>Most viewed:</p>
+                        <div class="book_scroll_container">
+                                <?php
+                                // Recommended books query
+                                $sql1 = "SELECT Books.id, Books.title, Books.authors, Books.publisher, Books.cover_url, Books.description, Books.Faculte, COUNT(views) AS view_count
+                                            FROM Books
+                                            ORDER BY view_count DESC
+                                            LIMIT 10";
+                                $result1 = $conn->query($sql1);
+
+                                if ($result1->num_rows > 0) {
+                                    while ($row = $result1->fetch_assoc()) {
+                                        echo '<div class="book">';
+                                        echo '<a href="book_details.php?id=' . htmlspecialchars($row["id"]) . '" class="book-link">';
+                                        echo '<div class="book-cover-container">';
+                                        if (!empty($row["cover_url"])) {
+                                            echo '<img src="' . htmlspecialchars($row["cover_url"]) . '" alt="Book cover" onerror="this.onerror=null; this.src=\'placeholder_icon.png\';" loading="lazy">';
+                                        } else {
+                                            echo '<img src="placeholder_icon.png" alt="No cover available">';
+                                        }
+                                        echo '<div class="tag">' . htmlspecialchars($row["Faculte"]) . '</div>';
+                                        echo '</div>';
+                                        echo '<div class="book-title">' . htmlspecialchars($row["title"]) . '</div>';
+                                        echo '<div class="book-author">by ' . htmlspecialchars($row["authors"]) . '</div>';
+                                        echo '</a>';
+                                        echo '</div>';
+                                    }
+                                } else {
+                                    echo '<p>No recommended books found.</p>';
+                                }
+                                ?>
+                            </div><br><br>
+                                <p>Lastest:</p>
+                            <div class="book_scroll_container">
+                                <?php
+                                // Newest books query
+                                $sql2 = "SELECT * FROM Books ORDER BY id DESC LIMIT 10";
+                                $result2 = $conn->query($sql2);
+
+                                if ($result2->num_rows > 0) {
+                                    while ($row = $result2->fetch_assoc()) {
+                                        echo '<div class="book">';
+                                        echo '<a href="book_details.php?id=' . htmlspecialchars($row["id"]) . '" class="book-link">';
+                                        echo '<div class="book-cover-container">';
+                                        if (!empty($row["cover_url"])) {
+                                            echo '<img src="' . htmlspecialchars($row["cover_url"]) . '" alt="Book cover" onerror="this.onerror=null; this.src=\'placeholder_icon.png\';">';
+                                        } else {
+                                            echo '<img src="placeholder_icon.png" alt="No cover available">';
+                                        }
+                                        echo '<div class="tag">' . htmlspecialchars($row["Faculte"]) . '</div>';
+                                        echo '</div>';
+                                        echo '<div class="book-title">' . htmlspecialchars($row["title"]) . '</div>';
+                                        echo '<div class="book-author">by ' . htmlspecialchars($row["authors"]) . '</div>';
+                                        echo '</a>';
+                                        echo '</div>';
+                                    }
+                                } else {
+                                    echo '<p>No newest books found.</p>';
+                                }
+                                ?></div>
+                            </div>
+                    </div>
+
+                    <!-- Filter Tab -->
+                    <div class="tab-pane fade" id="filter" role="tabpanel" aria-labelledby="filter-tab">
+                        <!-- Your Filter Tab Content Here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script>
-            let currentPage = 1;
-        const booksPerPage = 12; // 6 books per row * 2 rows = 12 books per page
 
-        const books = document.querySelectorAll('.book');
-        const totalBooks = books.length; // Get the total number of books
-
-        // Calculate total pages dynamically
-        const totalPages = Math.ceil(totalBooks / booksPerPage);
-
-        // Function to show the books for the current page
-        function showPage(page) {
-            const startIndex = (page - 1) * booksPerPage;
-            const endIndex = startIndex + booksPerPage;
-            
-            books.forEach((book, index) => {
-                if (index >= startIndex && index < endIndex) {
-                    book.style.display = 'block';
-                } else {
-                    book.style.display = 'none';
-                }
-            });
-
-            // Update page number
-            document.querySelector('.page-number').textContent = page;
-        }
-
-        // Pagination event listeners
-        document.querySelector('.next').addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                showPage(currentPage);
-            }
-        });
-
-        document.querySelector('.prev').addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                showPage(currentPage);
-            }
-        });
-
-        // Initial load
-        showPage(currentPage);
-
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
