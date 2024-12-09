@@ -1,158 +1,124 @@
+<?php
+// Start the session
+session_start();
+
+// Database connection
+$conn = new mysqli('localhost', 'root', 'nigga', 'library'); // Update with your database details
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Handle login form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = htmlspecialchars(trim($_POST['username']));
+    $password = trim($_POST['password']);
+
+    // Check if the username exists in the database
+    $stmt = $conn->prepare("SELECT id, password FROM user WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($user_id, $hashed_password);
+        $stmt->fetch();
+
+        // Verify password
+        if (password_verify($password, $hashed_password)) {
+            // Password matches, start session
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['username'] = $username;
+            header("Location: Sidebar.php"); // Redirect to a protected page
+            exit();
+        } else {
+            $error = "Invalid password.";
+        }
+    } else {
+        $error = "User not found.";
+    }
+
+    $stmt->close();
+}
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Login</title>
     <style>
-        /* Reusing your existing styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            list-style: none;
-            font-family: "Times New Roman", sans-serif;
-        }
-
-        .login-container {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f9f9f9;
-            padding: 20px; /* Add padding for smaller screens */
+            margin: 0;
         }
-
-        .login-box {
-            background-color: white;
-            padding: 40px;
-            border-radius: 15px;
+        .login-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px; /* Limit width */
+            width: 300px;
+        }
+        .login-container h2 {
+            margin: 0 0 15px;
             text-align: center;
         }
-
-        h2 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 20px;
+        .form-group {
+            margin-bottom: 15px;
         }
-
-        .login-button {
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
+        .form-group label {
+            display: block;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
             border: none;
-            border-radius: 8px;
+            color: #fff;
+            border-radius: 5px;
             cursor: pointer;
-            margin-top: 20px;
-            font-size: 16px;
-            width: 100%; /* Full width button */
         }
-
-        .login-button:hover {
-            background-color: #555;
+        .form-group button:hover {
+            background-color: #0056b3;
         }
-
-        /* Facebook button styles */
-        .fb-login-button {
-            background-color: #3b5998;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 16px;
-            width: 100%; /* Full width button */
-        }
-
-        .fb-login-button:hover {
-            background-color: #4c70a0;
-        }
-
-        /* Responsive styling */
-        @media (max-width: 768px) {
-            .login-box {
-                padding: 30px; /* Reduce padding for smaller screens */
-            }
-
-            h2 {
-                font-size: 24px; /* Reduce font size */
-            }
-
-            .login-button, .fb-login-button {
-                font-size: 14px; /* Smaller button text */
-            }
-        }
-
-        @media (max-width: 480px) {
-            .login-box {
-                padding: 20px; /* Further reduce padding */
-            }
-
-            h2 {
-                font-size: 20px; /* Smaller title */
-            }
-
-            .login-button, .fb-login-button {
-                font-size: 12px; /* Smaller button text */
-            }
+        .error {
+            color: red;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-
-<div class="login-container">
-    <div class="login-box">
+    <div class="login-container">
         <h2>Login</h2>
-        <p>Please click below to sign in with your Google or Facebook account.</p>
-
-        <!-- Google Login Button -->
-        <button class="login-button" onclick="signInWithGoogle()">Sign in with Google</button>
-
-        <!-- Facebook Login Button -->
-        <button class="fb-login-button" onclick="signInWithFacebook()">Sign in with Facebook</button>
+        <?php if (!empty($error)) echo "<p class='error'>$error</p>"; ?>
+        <form action="" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Login</button>
+            </div>
+        </form>
     </div>
-</div>
-
-<!-- Load Facebook SDK -->
-<script async defer src="https://connect.facebook.net/en_US/sdk.js" crossorigin="anonymous"></script>
-
-<script>
-    // Initialize Facebook SDK
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : 'YOUR_FACEBOOK_APP_ID', // Replace with your Facebook App ID
-            cookie     : true,
-            xfbml      : true,
-            version    : 'v15.0'
-        });
-    };
-
-    // Sign in with Google (Placeholder)
-    function signInWithGoogle() {
-        // Replace with your Google auth logic
-        window.location.href = "https://accounts.google.com/signin";
-    }
-
-    // Sign in with Facebook
-    function signInWithFacebook() {
-        FB.login(function(response) {
-            if (response.authResponse) {
-                console.log('Facebook login successful');
-                // You can now use response.authResponse to get the user info
-                FB.api('/me', function(profile) {
-                    console.log('Logged in as: ' + profile.name);
-                    // Process the user data as needed, e.g., send to your server for authentication
-                });
-            } else {
-                console.log('Facebook login failed');
-            }
-        }, { scope: 'public_profile,email' });
-    }
-</script>
-
 </body>
 </html>

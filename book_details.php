@@ -41,7 +41,9 @@ if ($book_id > 0) {
     exit;
 }
 
-$conn->close();
+?>
+<?php session_start(); // Start the session 
+    $_SESSION['user_id'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,6 +51,23 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($book['title']); ?> - Book Details</title>
+    <style>
+        /* Add CSS for Wishlist Button */
+        .wishlist-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 18px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        .wishlist-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
     <style>
         /* General Body Styling */
         body {
@@ -215,32 +234,18 @@ $conn->close();
                     <p><strong>ISBN:</strong> <?php echo htmlspecialchars($book['isbn']); ?></p>
                     <p><strong>Description:</strong> <?php echo htmlspecialchars($book['description']); ?></p>
                     <p><strong>Localisation:</strong> <?php echo htmlspecialchars($book['Faculte']); ?></p>
+
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <!-- Wishlist Button -->
+                        <a href="add_to_wishlist.php?book_id=<?php echo $book_id; ?>" class="wishlist-button">Add to Wishlist</a>
+                    <?php else: ?>
+                        <p><em>Log in to add this book to your wishlist.</em></p>
+                    <?php endif; ?>
                 </div>
             </div>
-            <div class="back-button">
-                <a href="Home.php" class="btn">Back to Book List</a>
-            </div>
-        </div>
-
-        <!-- Next Books Section -->
-        <div class="next-books-container">
-            <h2>Next Books</h2>
-            <?php if (!empty($nextBooks)): ?>
-                <ul class="next-books-list">
-                    <?php foreach ($nextBooks as $nextBook): ?>
-                        <li>
-                            <a href="book_details.php?id=<?php echo $nextBook['id']; ?>">
-                                <img src="<?php echo htmlspecialchars($nextBook['cover_url']); ?>" alt="Book cover">
-                                <?php echo htmlspecialchars($nextBook['title']); ?>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php else: ?>
-                <p>No more books available.</p>
-            <?php endif; ?>
         </div>
     </div>
 </body>
 </html>
 
+    

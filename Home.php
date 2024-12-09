@@ -12,6 +12,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 ?>
+<?php
+// Start the session
+session_start();
+
+?>
 
 
 <!DOCTYPE html>
@@ -20,6 +25,8 @@ if ($conn->connect_error) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Ravenbooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -143,37 +150,47 @@ if ($conn->connect_error) {
 </head>
 <body>
 
-    <!-- Header -->
-    
     <header class="header">
         <div class="header-title">Ravenbooks</div>
         <div>
-            <?php if (!isset($_SESSION['user_name'])): ?>
+            <?php if (!isset($_SESSION['username'])): ?>
                 <!-- Login Button if no session -->
                 <a href="login.php" class="btn btn-primary">Login</a>
             <?php else: ?>
-                <!-- Dropdown Menu if session exists -->
-                <div class="dropdown">
-                    <button
-                        class="btn btn-primary dropdown-toggle"
-                        type="button"
-                        id="userMenu"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <?= htmlspecialchars($_SESSION['user_name']) ?>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-thumbs-up like-icon"></i> Liked Books</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-heart"></i> Wishlist</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                    </ul>
-                </div>
-
+                <!-- User Icon with Modal Trigger -->
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#userInfoModal">
+                    <i class="fas fa-user-circle"></i> <!-- Font Awesome Icon -->
+                </button>
             <?php endif; ?>
+        </div>
     </header>
-    
-    </header>
+
+    <!-- Modal for User Info -->
+    <div class="modal fade" id="userInfoModal" tabindex="-1" aria-labelledby="userInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userInfoModalLabel">User Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Username:</strong> <?= htmlspecialchars($_SESSION['username']) ?></p>
+                    <p><strong>Email:</strong> user@example.com</p>
+                    <p><strong>Liked Books:</strong> 25</p>
+                    <p><strong>Wishlist Items:</strong> 8</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="logout.php" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="container mt-5">
         <div class="row">
@@ -212,6 +229,7 @@ if ($conn->connect_error) {
                 </ul>
 
                 <!-- Tab Content -->
+                 
                 <div class="tab-content mt-3" id="myTabContent">
                     <!-- Search Tab -->
                     <div class="tab-pane fade show active" id="search" role="tabpanel" aria-labelledby="search-tab">
@@ -476,6 +494,7 @@ if ($conn->connect_error) {
                     <!-- Filter Tab -->
                     <div class="tab-pane fade" id="filter" role="tabpanel" aria-labelledby="filter-tab">
                     <body>
+                    
                     <div class="container my-4">
                         <!-- Titre -->
                         <h1 class="text-center mb-4">Bibliothèque - Recherche par Lettre</h1>
